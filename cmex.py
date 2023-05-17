@@ -17,16 +17,16 @@ class Example:
       ex_pos = self.src_example.find(search_word)
 
       if (-1 < desc_pos) or (-1 < ex_pos):
-         self.point = self.point + 10
+         self.point = self.point + 100
 
          desc_words = self.description.split()
          ex_words = self.src_example.split()
 
          if search_word in desc_words:
-            self.point = self.point + 10
+            self.point = self.point + 70
 
          if search_word in ex_words:
-            self.point = self.point + 10
+            self.point = self.point + 100
 
    def compute_full_point(self):
       global search_terms
@@ -34,16 +34,9 @@ class Example:
       for search_word in search_terms:
          self.update_point_for_a_search_word(search_word)
 
-      if (20 > len(self.src_example)):
-        self.point + 5
-      elif (30 > len(self.src_example)):
-        self.point + 4
-      elif (40 > len(self.src_example)):
-        self.point + 3
-      elif (50 > len(self.src_example)):
-        self.point + 2
-      elif (60 > len(self.src_example)):
-        self.point + 1
+      max_length_point = 60
+      if ((0 != self.point) and (len(self.src_example) < max_length_point)):
+         max_length_point - len(self.src_example)
 
    def __repr__(self):
       return "[" + self.description + ", " + self.src_example + ", " + str(self.point) + "]"
@@ -92,21 +85,30 @@ def process_arguments():
    if "--stat" == sys.argv[1]:
      if (2 == len(sys.argv)):
         print_stats()
+        return 1
      else:
         print("illegal numbert of arguments")
+        return 1
    else:
       i = 1
       while i < len(sys.argv):
          if "-n" == sys.argv[i]:
             i = i + 1
+            if ((len(sys.argv) <= i) or not(sys.argv[i].isdigit())):
+               print("-n needs to follow a number")
+               return 1
+
             max_num_of_print = int(sys.argv[i])
          else:
             search_terms.append(sys.argv[i])
 
          i = i + 1
+      return 0
 
-      sort_examples()
-      print_results()
 
 load_all_sources()
-process_arguments()
+error_code = process_arguments()
+
+if (0 == error_code):
+   sort_examples()
+   print_results()
