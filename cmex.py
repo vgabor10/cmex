@@ -1,9 +1,8 @@
 import sys
-import config
 
 example_items = []
 max_num_of_print = 5
-search_terms = "---"
+search_terms = []
 source_files = []
 
 class Example:
@@ -29,11 +28,10 @@ class Example:
          if search_word in ex_words:
             self.point = self.point + 10
 
-   def compute_full_point(self, search_terms):
+   def compute_full_point(self):
+      global search_terms
 
-      search_terms_split = search_terms.split()
-
-      for search_word in search_terms_split:
+      for search_word in search_terms:
          self.update_point_for_a_search_word(search_word)
 
       if (20 > len(self.src_example)):
@@ -63,15 +61,15 @@ def load_examples(source_path):
          if example_items[-1].src_example == "-":
             example_items[-1].src_example = line[1:-2]
 
-def sort_examples(search_terms):
+def sort_examples():
 
    for ex in example_items:
-      ex.compute_full_point(search_terms)
+      ex.compute_full_point()
 
    example_items.sort(reverse = True, key=lambda example: example.point)
 
 def print_results():
-   for i in min(range(0, max_num_of_print), len(example_items)):
+   for i in range(0, min(max_num_of_print, len(example_items))):
       if (0 < example_items[i].point):
          print("> " + example_items[i].description)
          print(example_items[i].src_example)
@@ -84,7 +82,7 @@ def print_stats():
     print("number of examples: " + str(len(example_items)))
 
 def load_all_sources():
-   for s in config.source_files:
+   for s in source_files:
       load_examples(s)
 
 def process_arguments():
@@ -96,15 +94,18 @@ def process_arguments():
         print_stats()
      else:
         print("illegal numbert of arguments")
-   elif "-n" == sys.argv[1]:
-      max_num_of_print = int(sys.argv[2])
-      search_terms = sys.argv[3]
-
-      sort_examples(search_terms)
-      print_results()
    else:
-      search_terms = sys.argv[1]
-      sort_examples(search_terms)
+      i = 1
+      while i < len(sys.argv):
+         if "-n" == sys.argv[i]:
+            i = i + 1
+            max_num_of_print = int(sys.argv[i])
+         else:
+            search_terms.append(sys.argv[i])
+
+         i = i + 1
+
+      sort_examples()
       print_results()
 
 load_all_sources()
