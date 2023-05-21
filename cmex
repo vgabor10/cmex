@@ -59,15 +59,24 @@ def load_config(config_path : str):
 def load_examples(source_path):
    f = open(source_path, "r")
 
+   actual_example_index = -1
    for line in f:
       if line.startswith("*"):
          ex = Example()
          ex.description = line[2:-1]
          example_items.append(ex)
+         actual_example_index = len(example_items)-1
 
       if line.startswith("`"):
-         if example_items[-1].src_example == "-":
-            example_items[-1].src_example = line[1:-2]
+         if -1 == actual_example_index:
+            raise Exception("source file format error at line " + line) 
+
+         if example_items[actual_example_index].src_example == "-":
+               example_items[actual_example_index].src_example = line[1:-2]
+         else:
+            example_items[actual_example_index].src_example += '\n' + line[1:-2]
+      elif "" == line:
+         actual_example_index = -1
 
 def sort_examples():
 
