@@ -3,7 +3,10 @@
 # to .bashrc file the following line needs to be added:
 # export PATH=$PATH":$HOME/.../cmex"
 
+# cmex config file place: ~/.config/cmex/config.txt
+
 import sys
+import os
 import termcolor
 
 example_items = []
@@ -47,10 +50,16 @@ class Example:
    def __repr__(self):
       return "[" + self.description + ", " + self.src_example + ", " + str(self.point) + "]"
 
-def load_examples(source_path):
-    f = open(source_path, "r")
+def load_config(config_path : str):
+   f = open(config_path, "r")
+   for line in f:
+      if line.startswith("source_path: "):
+         source_files.append(line[14:-2])
 
-    for line in f:
+def load_examples(source_path):
+   f = open(source_path, "r")
+
+   for line in f:
       if line.startswith("*"):
          ex = Example()
          ex.description = line[2:-1]
@@ -130,6 +139,8 @@ def process_arguments():
       return 0
 
 if __name__ == '__main__':
+
+   load_config(os.path.expanduser('~') + "/.config/cmex/config.txt")
    load_all_sources()
    error_code = process_arguments()
 
